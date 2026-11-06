@@ -57,7 +57,7 @@ export default function HomePage() {
 
       <main className="flex-1 p-4">
         <section className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">Continue Reading</h2>
+          <h2 className="text-lg font-semibold mb-4">Continue Readingg</h2>
           <div className="flex flex-wrap gap-8">
             {continueReading.map((manga) => (
               <MangaCard key={manga.id} manga={manga} />
