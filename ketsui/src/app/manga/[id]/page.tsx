@@ -1,8 +1,9 @@
 'use client';
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+
 
 type MangaDetails = {
     manga: {
@@ -16,11 +17,11 @@ type MangaDetails = {
         };
     };
     coverFileName: string | null;
-    author: string[];
+    authors: string[];
     artists: string[];
 };
 
-export default function MangaDetailsPage() {
+function MangaDetailsContent() {
     const { id } = useParams();
 
     const [manga, setManga] = useState<MangaDetails | null>(null);
@@ -46,7 +47,11 @@ export default function MangaDetailsPage() {
             } finally {
                 setLoading(false);
             }
+            
         }
+        
+
+        
 
         fetchManga();
     }, [id]);
@@ -65,6 +70,8 @@ export default function MangaDetailsPage() {
             </main>
         );
     }
+
+    
 
     const attributes = manga.manga.attributes;
     const title = attributes.title.en || Object.values(attributes.title)[0] || "Unknown title";
@@ -107,7 +114,7 @@ export default function MangaDetailsPage() {
                     </h1>
 
                     <p className="mt-3 text-sm text-gray-400">
-                        {manga.author.join(', ') || 'Unknown author'}
+                        {manga.authors?.join(', ') || 'Unknown author'}
                     </p>
 
                     {manga.artists.length > 0 && (
@@ -142,5 +149,19 @@ export default function MangaDetailsPage() {
             {}
 
         </main>
+    );
+}
+
+export default function MangaDetailsPage() {
+    return (
+        <Suspense
+            fallback={
+                <main className="min-h-screen bg-black p-6 text-white">
+                    Loading manga...
+                </main>
+            }
+        >
+            <MangaDetailsContent />
+        </Suspense>
     );
 }

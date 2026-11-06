@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -14,58 +15,75 @@ export async function GET(
     }
 
     try {
-        const params = new URLSearchParams();
-        params.append('manga[]', id);
-        params.set('limit', '100');
-
-        const mangaResponse = await fetch(
-            `https://api.mangadex.org/cover?${params.toString()}`,
-            { cache: 'no-store' }
+        // coleta os detalhes do manga
+        const mangaUrl = new URL(
+            `https://api.mangadex.org/manga/${id}`
         );
+
+        mangaUrl.searchParams.append('includes[]', 'author');
+        mangaUrl.searchParams.append('includes[]', 'artist');
+        mangaUrl.searchParams.append('includes[]', 'cover_art');
+
+        // Coleta a capinha
+        const coverUrl = new URL(
+            'https://api.mangadex.org/cover'
+        );
+
+        coverUrl.searchParams.set('manga[]', id);
+        coverUrl.searchParams.set('limit', '10');
+
+        const [mangaResponse, coverResponse] = await Promise.all([
+            fetch(mangaUrl, { cache: 'no-store' }),
+            fetch(coverUrl, { cache: 'no-store' })
+        ]);
 
         if (!mangaResponse.ok) {
             return NextResponse.json(
-                { error: "Manga not found"},
+                { error: 'Manga not found' },
                 { status: mangaResponse.status }
             );
         }
 
+        // Converte pra json
         const mangaData = await mangaResponse.json();
+        const coverData = coverResponse.ok
+            ? await coverResponse.json()
+            : { data: [] };
+
         const manga = mangaData.data;
 
-        // Coletar as capinhas dos mangas
-
-        const coverResponse = await fetch(
-            `https://api.mangadex.org/cover?manga[]=${id}&limit=10`,
-            { cache: 'no-store' }
-        );
-
-        let coverFileName = null;
-
-        if (coverResponse.ok) {
-            const coverData = await coverResponse.json();
-
-            coverFileName = coverData.data[0]?.attributes?.fileName ?? null;
+        if (!manga) {
+            return NextResponse.json(
+                { error: 'Manga not found' },
+                { status: 404 }
+            );
         }
 
-        // Extrair o nome dos autores
+        // Extrai o nome da capinha
+        const coverFileName =
+            coverData.data?.[0]?.attributes?.fileName ?? null;
 
-        const author = manga.relantionships
-        .filter((rel: { type: string}) => rel.type === 'author')
-        .map((rel: { attributes: { name: string }}) => rel.attributes.name)
-        .filter(Boolean)
+        // Extrai autores e artistas
+        const relationships = manga.relationships ?? [];
 
-        const artists = manga.relationships
-        .filter((rel: { type: string}) => rel.type === 'artist')
-        .map((rel: { attributes: { name: string }}) => rel.attributes.name)
-        .filter(Boolean);
+        const authors = relationships
+            .filter((rel: any) => rel.type === 'author')
+            .map((rel: any) => rel.attributes?.name)
+            .filter(Boolean);
 
+        const artists = relationships
+            .filter((rel: any) => rel.type === 'artist')
+            .map((rel: any) => rel.attributes?.name)
+            .filter(Boolean);
+
+        // Retorna os dados do manga, capinha, autores e artistas
         return NextResponse.json({
             manga,
             coverFileName,
-            author,
-            artists,
+            authors,
+            artists
         });
+
     } catch (error) {
         console.error('Manga API error:', error);
 
@@ -73,6 +91,5 @@ export async function GET(
             { error: 'Failed to retrieve manga data' },
             { status: 500 }
         );
-            
     }
 }
