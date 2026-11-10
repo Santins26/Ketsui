@@ -9,6 +9,9 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+# Ignore generated files in all directories
+**/node_modules/
+**/.next/
 
 # testing
 /coverage
