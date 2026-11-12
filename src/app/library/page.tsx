@@ -88,10 +88,6 @@ export default function LibraryPage() {
                                     >
                                         Continue reading
                                     </Link>
-
-                                    <p className="mt-3 text-xs text-gray-500">
-                                        {new Date(manga.lastReadAt).toLocaleDateString()}
-                                    </p>
                                 </div>
                             </article>
                         ))}

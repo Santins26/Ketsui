@@ -68,7 +68,6 @@ export default function MangaSearch() {
     return (
         <section className="p-4">
             <h2 className="mb-4 text-xl font-bold">
-                Search Manga
             </h2>
 
             <form onSubmit={searchManga} className="flex gap-2">
@@ -77,13 +76,13 @@ export default function MangaSearch() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search manga..."
-                    className="w-full rounded-lg bg-gray-800 p-3 text-white"
+                    className="w-max rounded-lg bg-white p-3 text-black"
                 />
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="rounded-lg bg-blue-600 px-5 text-white"
+                    className="rounded-lg bg-blue-500 px-5 text-white hover:bg-blue-800 cursor-pointer"
                 >
                     {loading ? "..." : "Search"}
                 </button>
