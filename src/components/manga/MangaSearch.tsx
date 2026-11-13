@@ -76,7 +76,7 @@ export default function MangaSearch() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search manga..."
-                    className="w-max rounded-lg bg-white p-3 text-black"
+                    className="w-full rounded-lg bg-white p-3 text-black"
                 />
 
                 <button

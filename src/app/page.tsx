@@ -45,13 +45,19 @@ export default function HomePage() {
   return (
   <div className="min-h-screen bg-black text-white">
     <header className="flex items-center justify-between bg-black p-4">
-<Image
-  src="/logo/logo-512x512.png"
-  alt="logo"
-  width={80}
-  height={80}
-/>
-<h1 className="mr-95 text-xl font-bold">Ketsui</h1>
+
+      <div className="flex items-center">
+        <Image
+        src="/logo/logo-512x512.png"
+        alt="logo"
+        width={80}
+        height={80}
+        />
+        <h1 className="text-xl p-4 font-bold">Ketsui</h1>
+      </div>
+
+
+
 
       <div className="flex items-center gap-4">
         <MangaSearch />
@@ -67,6 +73,7 @@ export default function HomePage() {
         </select>
       </div>
     </header>
+    
 
     <nav className="flex gap-2 border-b border-white 0 p-4">
       {navItems.map((item) => {
