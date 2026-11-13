@@ -44,7 +44,7 @@ export default function HomePage() {
 
   return (
   <div className="min-h-screen bg-black text-white">
-    <header className="flex items-center justify-between bg-black p-4">
+    <header className="flex-col  items-center justify-between bg-black p-4">
 
       <div className="flex items-center">
         <Image
@@ -59,10 +59,11 @@ export default function HomePage() {
 
 
 
-      <div className="flex items-center gap-4">
+      <div className="flex-col gap-4">
         <MangaSearch />
-
-        <select
+      </div>
+      <div className="flex flex-col items-end gap-4 w-full">
+       <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="rounded bg-white px-2 py-1 text-black"
@@ -71,7 +72,7 @@ export default function HomePage() {
           <option value="reading">Reading</option>
           <option value="completed">Completed</option>
         </select>
-      </div>
+        </div>
     </header>
     
 

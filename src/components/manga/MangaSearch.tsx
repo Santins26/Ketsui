@@ -66,7 +66,7 @@ export default function MangaSearch() {
     }
 
     return (
-        <section className="p-4">
+        <section className="p-4 ">
             <h2 className="mb-4 text-xl font-bold">
             </h2>
 
