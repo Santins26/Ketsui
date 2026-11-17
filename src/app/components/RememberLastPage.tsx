@@ -1,50 +1,38 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function RememberLastPage() {
   const pathname = usePathname();
-  const router = useRouter();
-
   const [ready, setReady] = useState(false);
-  const target = useRef<string | null>(null);
-  const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
+    const saved = localStorage.getItem("ketsui-last-page");
+    const current = window.location.pathname;
 
-    const saved = localStorage.getItem("lastPage");
+    if (saved) {
+      const destination = new URL(saved, window.location.origin);
 
-    if (
-      saved &&
-      saved.startsWith("/") &&
-      !saved.startsWith("//") &&
-      saved !== window.location.pathname
-    ) {
-      target.current = saved;
-      router.replace(saved);
-    } else {
-      setReady(true);
+      if (
+        destination.origin === window.location.origin &&
+        destination.pathname !== current
+      ) {
+        window.location.replace(
+          destination.pathname + destination.search + destination.hash
+        );
+        return;
+      }
     }
-  }, [router]);
 
-
-  useEffect(() => {
-    if (ready) return;
-
-    if (target.current === pathname) {
-      target.current = null;
-      setReady(true);
-    }
-  }, [pathname, ready]);
+    setReady(true);
+  }, []);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !pathname) return;
 
-    localStorage.setItem("lastPage", pathname);
+    localStorage.setItem("ketsui-last-page", pathname);
   }, [pathname, ready]);
 
   return null;
