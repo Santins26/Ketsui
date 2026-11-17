@@ -1,28 +1,45 @@
+
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function RememberLastPage() {
-    const pathname = usePathname();
-    const router = useRouter();
+  const pathname = usePathname();
+  const router = useRouter();
 
-    useEffect(() => {
-        const lastPage = localStorage.getItem("lastPage");
-        const alreadyStarted = sessionStorage.getItem("appStarted");
+  const status = useRef<"pending" | "redirecting" | "ready">("pending");
+  const target = useRef<string | null>(null);
 
-        if (!alreadyStarted) {
-            sessionStorage.setItem("appStarted", "true");
+  useEffect(() => {
+    if (status.current === "pending") {
+      const lastPage = localStorage.getItem("lastPage");
 
-            if (lastPage && lastPage !== pathname) {
-                router.replace(lastPage);
-            }
-        }
-    }, [pathname, router]);
+      if (
+        lastPage &&
+        lastPage.startsWith("/") &&
+        !lastPage.startsWith("//") &&
+        lastPage !== pathname
+      ) {
+        target.current = lastPage;
+        status.current = "redirecting";
+        router.replace(lastPage);
+        return;
+      }
 
-    useEffect(() => {
-        localStorage.setItem("lastPage", pathname);
-    }, [pathname]);
+      status.current = "ready";
+    }
 
-    return null;
+    if (status.current === "redirecting") {
+      if (pathname !== target.current) return;
+
+      status.current = "ready";
+    }
+
+    if (status.current === "ready") {
+      localStorage.setItem("lastPage", pathname);
+    }
+  }, [pathname, router]);
+
+  return null;
 }
