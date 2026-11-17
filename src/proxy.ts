@@ -1,7 +1,9 @@
-// proxy.ts (in the project root, or in src/ if you use src/)
+// src/proxy.ts
 import { NextResponse, type NextRequest } from "next/server";
 
 export function proxy(req: NextRequest) {
+  if (req.nextUrl.searchParams.get("source") !== "pwa") return;
+
   const raw = req.cookies.get("ketsui-last-page")?.value;
   if (!raw) return;
 
