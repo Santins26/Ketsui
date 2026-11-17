@@ -1,34 +1,51 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function RememberLastPage() {
   const pathname = usePathname();
   const router = useRouter();
 
+  const [ready, setReady] = useState(false);
+  const target = useRef<string | null>(null);
+  const initialized = useRef(false);
+
   useEffect(() => {
-    const lastPage = localStorage.getItem("lastPage");
-    const currentPage = window.location.pathname;
+    if (initialized.current) return;
+    initialized.current = true;
+
+    const saved = localStorage.getItem("lastPage");
 
     if (
-      lastPage &&
-      lastPage.startsWith("/") &&
-      !lastPage.startsWith("//") &&
-      lastPage !== currentPage
+      saved &&
+      saved.startsWith("/") &&
+      !saved.startsWith("//") &&
+      saved !== window.location.pathname
     ) {
-      router.replace(lastPage);
+      target.current = saved;
+      router.replace(saved);
+    } else {
+      setReady(true);
     }
   }, [router]);
 
-  useEffect(() => {
-    const lastPage = localStorage.getItem("lastPage");
 
-    if (lastPage && lastPage !== pathname) return;
+  useEffect(() => {
+    if (ready) return;
+
+    if (target.current === pathname) {
+      target.current = null;
+      setReady(true);
+    }
+  }, [pathname, ready]);
+
+  useEffect(() => {
+    if (!ready) return;
 
     localStorage.setItem("lastPage", pathname);
-  }, [pathname]);
+  }, [pathname, ready]);
 
   return null;
 }

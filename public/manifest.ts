@@ -3,10 +3,12 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "My App",
-    short_name: "My App",
-    description: "My web application",
+    id: "/",
+    name: "Ketsui",
+    short_name: "Ketsui",
+    description: "Ketsui",
     start_url: "/",
+    scope: "/",
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#ffffff",
