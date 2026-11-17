@@ -1,39 +1,56 @@
-
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
+
+const KEY = "ketsui-last-page";
 
 export default function RememberLastPage() {
   const pathname = usePathname();
-  const [ready, setReady] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const restored = useRef(false);
+
 
   useEffect(() => {
-    const saved = localStorage.getItem("ketsui-last-page");
-    const current = window.location.pathname;
+    if (restored.current) return;
+    restored.current = true;
 
-    if (saved) {
-      const destination = new URL(saved, window.location.origin);
-
-      if (
-        destination.origin === window.location.origin &&
-        destination.pathname !== current
-      ) {
-        window.location.replace(
-          destination.pathname + destination.search + destination.hash
-        );
-        return;
+    try {
+      const saved = localStorage.getItem(KEY);
+      if (saved && window.location.pathname === "/" && saved !== "/") {
+        router.replace(saved);
       }
-    }
+    } catch {}
+  }, [router]);
 
-    setReady(true);
-  }, []);
+  const current =
+    pathname + (searchParams.toString() ? `?${searchParams}` : "");
 
   useEffect(() => {
-    if (!ready || !pathname) return;
+    if (!restored.current) return;
+    try {
+      localStorage.setItem(KEY, current);
+    } catch {}
+  }, [current]);
 
-    localStorage.setItem("ketsui-last-page", pathname);
-  }, [pathname, ready]);
+  useEffect(() => {
+    const save = () => {
+      try {
+        localStorage.setItem(
+          KEY,
+          window.location.pathname + window.location.search
+        );
+      } catch {}
+    };
+    const onVis = () => document.visibilityState === "hidden" && save();
+    window.addEventListener("pagehide", save);
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.removeEventListener("pagehide", save);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
 
   return null;
 }
