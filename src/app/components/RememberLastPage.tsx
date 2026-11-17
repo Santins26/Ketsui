@@ -1,47 +1,34 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function RememberLastPage() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const [restored, setRestored] = useState(false);
-  const redirectTarget = useRef<string | null>(null);
-
   useEffect(() => {
     const lastPage = localStorage.getItem("lastPage");
+    const currentPage = window.location.pathname;
 
     if (
       lastPage &&
       lastPage.startsWith("/") &&
       !lastPage.startsWith("//") &&
-      lastPage !== window.location.pathname
+      lastPage !== currentPage
     ) {
-      redirectTarget.current = lastPage;
       router.replace(lastPage);
-    } else {
-      setRestored(true);
     }
   }, [router]);
 
   useEffect(() => {
-    if (!restored) {
-      if (
-        redirectTarget.current &&
-        pathname === redirectTarget.current
-      ) {
-        redirectTarget.current = null;
-        setRestored(true);
-      }
+    const lastPage = localStorage.getItem("lastPage");
 
-      return;
-    }
+    if (lastPage && lastPage !== pathname) return;
 
     localStorage.setItem("lastPage", pathname);
-  }, [pathname, restored]);
+  }, [pathname]);
 
   return null;
 }
