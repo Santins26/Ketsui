@@ -200,7 +200,7 @@ console.log("Fresh navigation chapters:", chapters.length);
 
             {!loading && !error && pages.length > 0 && (
     <>
-        <MangaReader pages={pages} />
+       <MangaReader key={chapterId} pages={pages} storageKey={`${id}/${chapterId}`} />
 
         <nav className="mx-auto flex max-w-4xl items-center justify-between gap-4 border-t border-gray-800 p-6">
             {previousChapter ? (
